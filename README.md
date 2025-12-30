@@ -32,9 +32,9 @@ An analytics dashboard that visualizes GitHub user data with a premium aesthetic
 
 3. Set up environment variables:
    ```bash
-   cp .env.example .env.local
+   cp .env.example .env
    ```
-   Then edit `.env.local` and add your GitHub token.
+   Then edit `.env` and add your GitHub token.
 
 4. Run the development server:
    ```bash

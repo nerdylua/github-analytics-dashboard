@@ -96,7 +96,7 @@ export default function Home() {
           className="flex flex-wrap justify-center gap-3 text-sm text-zinc-500"
         >
           <span>Try:</span>
-          {['torvalds', 'shadcn', 'vercel'].map((u) => (
+          {['torvalds', 'shadcn', 'cubestar1'].map((u) => (
             <button
               key={u}
               onClick={() => router.push(`/${u}`)}
