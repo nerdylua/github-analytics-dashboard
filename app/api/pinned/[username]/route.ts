@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { unstable_cache } from "next/cache";
+import { rateLimit, getClientIp } from "../../lib/rate-limit";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
@@ -62,6 +64,18 @@ export async function GET(
     );
   }
 
+  const ip = getClientIp(request);
+  const { success, remaining } = rateLimit(ip);
+
+  if (!success) {
+    const response = createSecureResponse(
+      { error: "Too many requests. Please try again later." },
+      429
+    );
+    response.headers.set("Retry-After", "60");
+    return response;
+  }
+
   const { username } = await params;
 
   if (!isValidGitHubUsername(username)) {
@@ -99,8 +113,14 @@ export async function GET(
     }
   `;
 
+  const getCachedPinnedRepos = unstable_cache(
+    async () => queryGitHub(query, { username }),
+    [`pinned-repos-${username}`],
+    { revalidate: 300 }
+  );
+
   try {
-    const data = await queryGitHub(query, { username });
+    const data = await getCachedPinnedRepos();
 
     if (data.errors) {
       console.error("GitHub API errors:", JSON.stringify(data.errors));
@@ -113,7 +133,9 @@ export async function GET(
       );
     }
 
-    return createSecureResponse(data.data);
+    const response = createSecureResponse(data.data);
+    response.headers.set("X-RateLimit-Remaining", remaining.toString());
+    return response;
   } catch (error) {
     console.error("GitHub API request failed:", error);
     const isTimeout = error instanceof Error && error.name === "AbortError";
