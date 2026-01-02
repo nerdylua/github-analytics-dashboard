@@ -126,6 +126,22 @@ export default function Home() {
             <span className="text-xs font-mono uppercase tracking-widest">Global</span>
           </div>
         </motion.div>
+
+        <motion.footer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 1 }}
+          className="pt-8 text-center"
+        >
+          <a
+            href="https://github.com/nerdylua"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+          >
+            built by <span className="font-medium">nerdylua</span>
+          </a>
+        </motion.footer>
       </motion.div>
     </main>
   );
